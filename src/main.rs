@@ -1,18 +1,17 @@
+use std::error::Error;
+use std::future::Future;
+
 use actix_web::{App, HttpServer, web};
-use sqlx::Pool;
-use sqlx::postgres::PgPoolOptions;
-use crate::models::produto::Produto;
-use crate::repository::find_all;
+use sqlx::sqlite::{SqliteConnectOptions, SqliteError};
+use sqlx::SqlitePool;
 
 mod models;
 mod repository;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let url = "postgres://@localhost:5432/api";
-    let pool = PgPoolOptions::new().connect_lazy(url).expect("Erro ao se conectar ao Banco de Dados");
 
-    find_all::<Produto>(&pool).await;
+    let pool = connect().await.expect("Erro ao se conectar no DB.");
 
     HttpServer::new(move || {
         App::new()
@@ -21,4 +20,13 @@ async fn main() -> std::io::Result<()> {
         .bind("127.0.0.1:8080")?
         .run()
         .await
+}
+
+
+async fn connect() -> Result<SqlitePool, SqliteError> {
+    let options = SqliteConnectOptions::new()
+        .filename("./api.db")
+        .create_if_missing(true);
+
+    SqlitePool::connect_with(options)
 }
