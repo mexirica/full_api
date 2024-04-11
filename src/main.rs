@@ -1,16 +1,17 @@
+use std::env;
 use std::error::Error;
 use std::future::Future;
 
 use actix_web::{App, HttpServer, web};
 use sqlx::sqlite::{SqliteConnectOptions, SqliteError};
 use sqlx::SqlitePool;
+use dotenv::dotenv;
 
 mod models;
 mod repository;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     let pool = connect().await.expect("Erro ao se conectar no DB.");
 
     HttpServer::new(move || {
@@ -24,8 +25,12 @@ async fn main() -> std::io::Result<()> {
 
 
 async fn connect() -> Result<SqlitePool, SqliteError> {
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL deve estar setada");
+
     let options = SqliteConnectOptions::new()
-        .filename("./api.db")
+        .filename(database_url)
         .create_if_missing(true);
 
     SqlitePool::connect_with(options)
