@@ -1,7 +1,6 @@
-use uuid::Uuid;
 
 pub struct Endereco {
-    pub fornecedor_id: Uuid,
+    pub fornecedor_id: i64,
     pub logradouro: String,
     pub numero: String,
     pub complemento: String,
@@ -13,7 +12,7 @@ pub struct Endereco {
 
 impl Endereco {
     pub fn new(
-        fornecedor_id: Uuid,logradouro: String, numero: String,
+        fornecedor_id: i64,logradouro: String, numero: String,
        complemento: String,cep:String,bairro:String,cidade:String, estado:String)
         -> Self {
         Self{fornecedor_id,logradouro,numero,complemento,cep,bairro,cidade,estado}

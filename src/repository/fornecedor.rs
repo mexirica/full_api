@@ -1,47 +1,46 @@
-use sqlx::PgPool;
+use sqlx::SqlitePool;
+use crate::models::DTO;
 
-use sqlx::Error;
+use crate::models::fornecedor::{Fornecedor, NewFornecedor};
 use crate::repository::Repository;
-use crate::models::fornecedor::Fornecedor;
+
+pub type TNewFornecedor = NewFornecedor;
 #[async_trait::async_trait]
 impl Repository<Fornecedor> for Fornecedor{
 
-    async fn find_by_id(pool: &PgPool, id: i32) -> Result<Option<Fornecedor>, sqlx::Error> {
-        let pool = pool.lock().unwrap();
+    async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Fornecedor>, sqlx::Error> {
         let mut conn = pool.acquire().await?;
         let row = sqlx::query_as!(Fornecedor,r#"SELECT * FROM fornecedor WHERE id = $1"#,id)
-            .fetch_optional(&mut *conn)
+            .fetch_optional(&mut conn)
             .await?;
 
         Ok(row)
     }
 
-    async fn find_all(pool: &PgPool) -> Result<Vec<Fornecedor>, sqlx::Error> {
-        let pool = pool.lock().unwrap();
+    async fn find_all(pool: &SqlitePool) -> Result<Vec<Fornecedor>, sqlx::Error> {
         let mut conn = pool.acquire().await?;
-        let rows = sqlx::query_as!(models::Fornecedor,"SELECT * FROM fornecedor")
-            .fetch_all(&mut *conn)
+        let rows = sqlx::query_as!(Fornecedor,"SELECT * FROM fornecedor")
+            .fetch_all(&mut conn)
             .await?;
 
         Ok(rows)
     }
 
-    async fn save(pool: &PgPool, item: Fornecedor) -> Result<(), sqlx::Error> {
-        let pool = pool.lock().unwrap();
+    async fn save(pool: &SqlitePool, item: NewFornecedor) -> Result<(), sqlx::Error> {
+        let fornecedor: Fornecedor = item.into();
         let mut conn = pool.acquire().await?;
-        let rows_affected = sqlx::query!(r#"INSERT INTO fornecedor (title,created_at,body,category)
-        VALUES ($1,NOW(),$2,$3)"#,item.title,item.body,item.category)
-            .execute(&mut *conn)
+        let rows_affected = sqlx::query!(r#"INSERT INTO fornecedor (id,nome,documento,tipo_fornecedor,endereco_id,ativo)
+        VALUES ($1,$2,$3,$4,$5,$6)"#,fornecedor.id,fornecedor.nome,fornecedor.documento,fornecedor.tipo_fornecedor,fornecedor.endereco_id,fornecedor.ativo)
+            .execute(&mut conn)
             .await?;
 
         Ok(())
     }
 
-    async fn delete(pool: &PgPool, id: i32) -> Result<(), sqlx::Error> {
-        let pool = pool.lock().unwrap();
+    async fn delete(pool: &SqlitePool, id: i64) -> Result<(), sqlx::Error> {
         let mut conn = pool.acquire().await?;
         let rows_affected = sqlx::query!(r#"DELETE FROM fornecedor WHERE id = $1"#,id)
-            .execute(&mut *conn)
+            .execute(&mut conn)
             .await?;
 
         Ok(())

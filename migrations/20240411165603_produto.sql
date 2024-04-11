@@ -1,5 +1,5 @@
 CREATE TABLE Produto (
-                         id TEXT PRIMARY KEY,
+                         id INTEGER PRIMARY KEY AUTOINCREMENT ,
                          nome TEXT NOT NULL,
                          imagem TEXT,
                          valor REAL NOT NULL,

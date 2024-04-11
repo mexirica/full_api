@@ -1,5 +1,5 @@
 CREATE TABLE Endereco (
-                          fornecedor_id TEXT PRIMARY KEY,
+                          fornecedor_id INTEGER PRIMARY KEY AUTOINCREMENT ,
                           logradouro TEXT NOT NULL,
                           numero TEXT,
                           complemento TEXT,

@@ -1,33 +1,49 @@
-use chrono::{DateTime, Utc};
+use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
-use uuid::Uuid;
+use crate::models::DTO;
+
 #[derive(Serialize,Deserialize,FromRow)]
 pub struct Produto {
-    pub id: Uuid,
+    pub id: i64,
     pub nome: String,
-    pub imagem: String,
-    pub valor: f32,
-    pub data_cadastro: DateTime<Utc>,
+    pub imagem: Option<String>,
+    pub valor: f64,
+    pub data_cadastro: NaiveDateTime,
     pub fornecedores_id: String,
     pub ativo: bool
 }
 
+#[derive(Serialize,Deserialize)]
+pub struct NewProduto{
+    pub nome: String,
+    pub imagem: String,
+    pub valor: f64,
+    pub fornecedores_id: String,
+}
 impl Produto {
     pub fn new(
         nome: String,
         imagem: String,
-        valor: f32,
+        valor: f64,
         fornecedores_id: String,
     ) -> Self {
         Self {
-            id : Uuid::new_v4(),
+            id : 0,
             nome,
-            imagem,
-            valor,
-            data_cadastro : Utc::now(),
+            imagem: Some(imagem),
+            valor: valor,
+            data_cadastro : Utc::now().naive_utc(),
             ativo : true,
             fornecedores_id
         }
     }
 }
+
+impl From<NewProduto> for Produto {
+    fn from(new_produto: NewProduto) -> Self {
+        Produto::new(new_produto.nome,new_produto.imagem,new_produto.valor,new_produto.fornecedores_id)
+    }
+}
+
+impl DTO for NewProduto{}

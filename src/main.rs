@@ -3,9 +3,9 @@ use std::error::Error;
 use std::future::Future;
 
 use actix_web::{App, HttpServer, web};
-use sqlx::sqlite::{SqliteConnectOptions, SqliteError};
-use sqlx::SqlitePool;
 use dotenv::dotenv;
+use sqlx::{Pool, Sqlite, SqlitePool};
+use sqlx::sqlite::SqliteConnectOptions;
 
 mod models;
 mod repository;
@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
 }
 
 
-async fn connect() -> Result<SqlitePool, SqliteError> {
+async fn connect() -> Result<Pool<Sqlite>, sqlx::Error> {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL deve estar setada");
@@ -33,5 +33,5 @@ async fn connect() -> Result<SqlitePool, SqliteError> {
         .filename(database_url)
         .create_if_missing(true);
 
-    SqlitePool::connect_with(options)
+    SqlitePool::connect_with(options).await
 }
