@@ -11,7 +11,7 @@ impl Repository<Produto> for Produto {
 
     async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Produto>, Error> {
         let mut conn = pool.acquire().await?;
-        let row = sqlx::query_as!(Produto, r#"SELECT * FROM produto WHERE id = $1"#, &id)
+        let row = sqlx::query_as!(Produto, r#"SELECT * FROM produto WHERE id = $1"#, id)
             .fetch_optional(&mut *conn)
             .await?;
 
@@ -27,7 +27,7 @@ impl Repository<Produto> for Produto {
         Ok(rows)
     }
 
-    async fn save(pool: &SqlitePool, item: NewProduto) -> Result<(), Error> {
+    async fn save(pool: &SqlitePool, item: Produto) -> Result<(), Error> {
         let produto: Produto = item.into();
         let mut conn = pool.acquire().await?;
         let _rows_affected = sqlx::query!(

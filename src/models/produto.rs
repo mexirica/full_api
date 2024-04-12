@@ -32,7 +32,7 @@ impl Produto {
             id : 0,
             nome,
             imagem: Some(imagem),
-            valor: valor,
+            valor,
             data_cadastro : Utc::now().naive_utc(),
             ativo : true,
             fornecedores_id

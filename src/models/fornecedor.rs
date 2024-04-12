@@ -10,7 +10,7 @@ pub struct Fornecedor {
     pub id: i64,
     pub nome: String,
     pub documento: String,
-    pub tipo_fornecedor: TipoFornecedor,
+    pub tipo_fornecedor: i64,
     pub endereco_id: String,
     pub ativo: bool
 }
@@ -18,7 +18,7 @@ pub struct Fornecedor {
 
 
 impl Fornecedor{
-    pub fn new(nome: String,documento: String,tipo_fornecedor: TipoFornecedor,endereco_id: String) -> Self {
+    pub fn new(nome: String,documento: String,tipo_fornecedor: i64,endereco_id: String) -> Self {
         Self{ id: 0, nome,documento,tipo_fornecedor,endereco_id,ativo:true}
     }
 }
@@ -26,7 +26,7 @@ impl Fornecedor{
 pub struct NewFornecedor {
     pub nome: String,
     pub documento: String,
-    pub tipo_fornecedor: TipoFornecedor,
+    pub tipo_fornecedor: i64,
     pub endereco: String,
 }
 impl DTO for NewFornecedor{}

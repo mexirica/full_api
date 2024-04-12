@@ -6,9 +6,12 @@ use actix_web::{App, HttpServer, web};
 use dotenv::dotenv;
 use sqlx::{Pool, Sqlite, SqlitePool};
 use sqlx::sqlite::SqliteConnectOptions;
+use crate::models::produto::Produto;
 
 mod models;
 mod repository;
+mod auth;
+mod telemetry;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
