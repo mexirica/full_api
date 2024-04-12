@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/migrations/20240411165618_fornecedor.sql" dialect="SQLite" />
-    <file url="file://$PROJECT_DIR$/migrations/20240411165655_endereco.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/migrations/20240412133556_users.sql" dialect="SQLite" />
   </component>
 </project>

@@ -1,6 +1,7 @@
 use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+
 use crate::models::DTO;
 
 #[derive(Serialize,Deserialize,FromRow)]
@@ -32,7 +33,7 @@ impl Produto {
             id : 0,
             nome,
             imagem: Some(imagem),
-            valor: valor,
+            valor,
             data_cadastro : Utc::now().naive_utc(),
             ativo : true,
             fornecedores_id

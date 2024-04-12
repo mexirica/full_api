@@ -9,6 +9,9 @@ use sqlx::sqlite::SqliteConnectOptions;
 
 mod models;
 mod repository;
+mod auth;
+mod telemetry;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
