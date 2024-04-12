@@ -1,9 +1,9 @@
 use std::fmt::Debug;
 
-use sqlx::{Acquire, Error, SqlitePool};
+use sqlx::{Error, SqlitePool};
 use sqlx::prelude::*;
-use crate::models::DTO;
-use crate::models::produto::{Produto, NewProduto};
+
+use crate::models::produto::Produto;
 use crate::repository::Repository;
 
 #[async_trait::async_trait]

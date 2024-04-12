@@ -2,6 +2,8 @@ use anyhow::Context;
 use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use argon2::password_hash::SaltString;
 use sqlx::SqlitePool;
+use crate::models::users::User;
+
 use crate::telemetry::spawn_blocking_with_tracing;
 
 #[derive(thiserror::Error, Debug)]
@@ -10,11 +12,6 @@ pub enum AuthError {
     InvalidCredentials(#[source] anyhow::Error),
     #[error(transparent)]
     UnexpectedError(#[from] anyhow::Error),
-}
-
-pub struct Login     {
-    pub username: String,
-    pub password: String,
 }
 
 #[tracing::instrument(name = "Get stored credentials", skip(username, pool))]
@@ -39,7 +36,7 @@ async fn get_stored_credentials(
 
 #[tracing::instrument(name = "Validate credentials", skip(credentials, pool))]
 pub async fn validate_credentials(
-    credentials: Login,
+    credentials: User,
     pool: &SqlitePool,
 ) -> Result<String, AuthError> {
     let mut user_id = None;
@@ -112,7 +109,7 @@ pub async fn change_password(
     Ok(())
 }
 
-fn compute_password_hash(password: String) -> Result<String, anyhow::Error> {
+pub(crate) fn compute_password_hash(password: String) -> Result<String, anyhow::Error> {
     let salt = SaltString::generate(&mut rand::thread_rng());
     let password_hash = Argon2::new(
         Algorithm::Argon2id,

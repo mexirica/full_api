@@ -1,6 +1,7 @@
 use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
+
 use crate::models::DTO;
 
 #[derive(Serialize,Deserialize,FromRow)]

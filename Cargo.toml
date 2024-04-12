@@ -20,3 +20,4 @@ thiserror = "1.0.58"
 tracing = "0.1.40"
 uuid = { version = "1.8.0", features = ["v4"] }
 rand = "0.8.5"
+jsonwebtoken = "9.3.0"

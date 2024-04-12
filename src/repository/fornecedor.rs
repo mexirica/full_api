@@ -1,7 +1,6 @@
 use sqlx::SqlitePool;
-use crate::models::DTO;
 
-use crate::models::fornecedor::{Fornecedor, NewFornecedor};
+use crate::models::fornecedor::Fornecedor;
 use crate::repository::Repository;
 
 #[async_trait::async_trait]
@@ -25,8 +24,8 @@ impl Repository<Fornecedor> for Fornecedor{
 
     async fn save(pool: &SqlitePool, item: Fornecedor) -> Result<(), sqlx::Error> {
         let fornecedor: Fornecedor = item.into();
-        let rows_affected = sqlx::query!(r#"INSERT INTO fornecedor (id,nome,documento,tipo_fornecedor,endereco_id,ativo)
-        VALUES ($1,$2,$3,$4,$5,$6)"#,fornecedor.id,fornecedor.nome,fornecedor.documento,fornecedor.tipo_fornecedor,fornecedor.endereco_id,fornecedor.ativo)
+        let rows_affected = sqlx::query!(r#"INSERT INTO fornecedor (id,nome,documento,tipo_fornecedor,ativo)
+        VALUES ($1,$2,$3,$4,$5)"#,fornecedor.id,fornecedor.nome,fornecedor.documento,fornecedor.tipo_fornecedor,fornecedor.ativo)
             .execute(pool)
             .await?;
 
