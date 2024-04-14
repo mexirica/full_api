@@ -1,4 +1,3 @@
-use std::fmt::Debug;
 
 use sqlx::{Error, SqlitePool};
 use sqlx::prelude::*;
@@ -8,14 +7,10 @@ use crate::repository::Repository;
 
 #[async_trait::async_trait]
 impl Repository<Produto> for Produto {
-
     async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<Produto>, Error> {
-        let row = sqlx::query_as!(Produto, r#"SELECT * FROM produto WHERE id = $1"#, id)
-            .fetch_optional(pool)
-            .await?;
-
-        Ok(row)
+        todo!()
     }
+
 
     async fn find_all(pool: &SqlitePool) -> Result<Vec<Produto>, Error> {
         let rows = sqlx::query_as!(Produto, "SELECT * FROM produto")
@@ -38,12 +33,6 @@ impl Repository<Produto> for Produto {
     }
 
     async fn delete(pool: &SqlitePool, id: i64) -> Result<(), Error> {
-        let _rows_affected = sqlx::query!(
-            r#"DELETE FROM Produto WHERE id = $1"#,
-            id)
-            .execute(pool)
-            .await?;
-
-        Ok(())
+        todo!()
     }
 }

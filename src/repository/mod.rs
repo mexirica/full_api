@@ -1,9 +1,9 @@
 use sqlx::{Error, SqlitePool};
 
-use crate::models::DTO;
-
 mod produto;
 mod fornecedor;
+mod user;
+
 #[async_trait::async_trait]
 pub trait Repository<T>{
     async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<T>, Error>;

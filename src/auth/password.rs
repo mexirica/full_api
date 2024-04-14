@@ -2,8 +2,8 @@ use anyhow::Context;
 use argon2::{Algorithm, Argon2, Params, PasswordHash, PasswordHasher, PasswordVerifier, Version};
 use argon2::password_hash::SaltString;
 use sqlx::SqlitePool;
-use crate::models::users::User;
 
+use crate::models::users::Users;
 use crate::telemetry::spawn_blocking_with_tracing;
 
 #[derive(thiserror::Error, Debug)]
@@ -36,7 +36,7 @@ async fn get_stored_credentials(
 
 #[tracing::instrument(name = "Validate credentials", skip(credentials, pool))]
 pub async fn validate_credentials(
-    credentials: User,
+    credentials: Users,
     pool: &SqlitePool,
 ) -> Result<String, AuthError> {
     let mut user_id = None;
@@ -91,7 +91,7 @@ pub async fn change_password(
     password: String,
     pool: &SqlitePool,
 ) -> Result<(), anyhow::Error> {
-    let password_hash = spawn_blocking_with_tracing(move || compute_password_hash(password))
+    let password_hash = spawn_blocking_with_tracing(move || compute_password_hash(&password))
         .await?
         .context("Failed to hash password")?;
     sqlx::query!(
@@ -109,7 +109,7 @@ pub async fn change_password(
     Ok(())
 }
 
-pub(crate) fn compute_password_hash(password: String) -> Result<String, anyhow::Error> {
+pub(crate) fn compute_password_hash(password: &String) -> Result<String, anyhow::Error> {
     let salt = SaltString::generate(&mut rand::thread_rng());
     let password_hash = Argon2::new(
         Algorithm::Argon2id,

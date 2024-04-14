@@ -1,5 +1,6 @@
 use chrono::{Duration, Local};
-use jsonwebtoken::{Algorithm, decode, DecodingKey, encode, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation};
+use jsonwebtoken::Algorithm::HS256;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -8,6 +9,7 @@ pub struct Claims {
     sub: String,
     iat: i64,
     exp: i64,
+    username: String
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,9 +28,10 @@ pub async fn create_access_token(user: &String) -> Result<String, jsonwebtoken::
         sub: String::from("API Rust"),
         iat,
         exp,
+        username: user.to_string()
     };
 
-    let mut token = encode(&Header::new(Algorithm::HS256), &claims, &EncodingKey::from_secret("superSecretKey".as_ref()));
+    let token = encode(&Header::new(HS256), &claims, &EncodingKey::from_secret("superSecretKey".as_ref()));
 
     match token {
         Ok(value) => { return Ok(value)}
@@ -46,9 +49,11 @@ pub async fn create_refresh_token(user: &String) -> Result<String, jsonwebtoken:
         sub: String::from("API Rust"),
         iat,
         exp,
+        username: user.to_string()
+
     };
 
-    let mut token = encode(&Header::new(Algorithm::HS256), &claims, &EncodingKey::from_secret("superSecretKey".as_ref()));
+    let token = encode(&Header::new(HS256), &claims, &EncodingKey::from_secret("superSecretKey".as_ref()));
 
     match token {
         Ok(value) => { return Ok(value)}
@@ -58,10 +63,7 @@ pub async fn create_refresh_token(user: &String) -> Result<String, jsonwebtoken:
 fn validate_token(token: &str) -> Result<(), String> {
     let decoding_key = DecodingKey::from_secret("superSecretKey".as_ref());
 
-    let validation = Validation {
-        algorithms: vec![Algorithm::HS256],
-        ..Validation::default()
-    };
+    let validation = Validation::new(HS256);
 
     match decode::<serde_json::Value>(token, &decoding_key, &validation) {
         Ok(_) => Ok(()),
