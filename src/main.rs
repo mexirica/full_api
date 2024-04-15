@@ -5,11 +5,12 @@ use dotenv::dotenv;
 use sqlx::{Pool, Sqlite, SqlitePool};
 use sqlx::sqlite::SqliteConnectOptions;
 
+mod auth;
 mod models;
 mod repository;
-mod auth;
-mod telemetry;
 mod routes;
+mod telemetry;
+mod services;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -18,24 +19,13 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
-            .configure(handler)
             .configure(routes::users::configure::handler)
+            .configure(routes::auth::configure::handler)
+            .configure(routes::fornecedor::configure::handler)
     })
-        .bind("127.0.0.1:8080")?
-        .run()
-        .await
-}
-
-pub fn handler(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("/hello")
-            .service(hello)
-
-    );
-}
-#[get("")]
-pub async fn hello() -> impl Responder {
-    return "Hello Linkedin"
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
 }
 
 async fn connect() -> Result<Pool<Sqlite>, sqlx::Error> {

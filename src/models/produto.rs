@@ -4,7 +4,7 @@ use sqlx::FromRow;
 
 use crate::models::DTO;
 
-#[derive(Serialize,Deserialize,FromRow)]
+#[derive(Serialize, Deserialize, FromRow)]
 pub struct Produto {
     pub id: i64,
     pub nome: String,
@@ -12,39 +12,39 @@ pub struct Produto {
     pub valor: f64,
     pub data_cadastro: NaiveDateTime,
     pub fornecedores_id: String,
-    pub ativo: bool
+    pub ativo: bool,
 }
 
-#[derive(Serialize,Deserialize)]
-pub struct NewProduto{
+#[derive(Serialize, Deserialize)]
+pub struct NewProduto {
     pub nome: String,
     pub imagem: String,
     pub valor: f64,
     pub fornecedores_id: String,
 }
 impl Produto {
-    pub fn new(
-        nome: String,
-        imagem: String,
-        valor: f64,
-        fornecedores_id: String,
-    ) -> Self {
+    pub fn new(nome: String, imagem: String, valor: f64, fornecedores_id: String) -> Self {
         Self {
-            id : 0,
+            id: 0,
             nome,
             imagem: Some(imagem),
             valor,
-            data_cadastro : Utc::now().naive_utc(),
-            ativo : true,
-            fornecedores_id
+            data_cadastro: Utc::now().naive_utc(),
+            ativo: true,
+            fornecedores_id,
         }
     }
 }
 
 impl From<NewProduto> for Produto {
     fn from(new_produto: NewProduto) -> Self {
-        Produto::new(new_produto.nome,new_produto.imagem,new_produto.valor,new_produto.fornecedores_id)
+        Produto::new(
+            new_produto.nome,
+            new_produto.imagem,
+            new_produto.valor,
+            new_produto.fornecedores_id,
+        )
     }
 }
 
-impl DTO for NewProduto{}
+impl DTO for NewProduto {}
