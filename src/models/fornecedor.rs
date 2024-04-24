@@ -28,7 +28,6 @@ impl Fornecedor {
     }
 }
 #[derive(Debug, Serialize, Deserialize)]
-
 pub struct NewFornecedor {
     pub nome: String,
     pub documento: String,
