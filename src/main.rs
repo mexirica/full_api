@@ -2,8 +2,10 @@ use std::env;
 
 use actix_web::{App, get, HttpServer, Responder, web};
 use dotenv::dotenv;
+use repository::uow;
 use sqlx::{Pool, Sqlite, SqlitePool};
 use sqlx::sqlite::SqliteConnectOptions;
+use uow::UnitOfWork;
 
 mod auth;
 mod models;
@@ -14,11 +16,13 @@ mod services;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    let pool = connect().await.expect("Erro ao se conectar no DB.");
+    let pool = connect().await;
+    let uow = UnitOfWork::new(pool).await;
 
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(uow.clone())
+            .route("/health", web::get().to(|| async { "Is working!" }))
             .configure(routes::users::configure::handler)
             .configure(routes::auth::configure::handler)
             .configure(routes::fornecedor::configure::handler)
@@ -27,14 +31,14 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-async fn connect() -> Result<Pool<Sqlite>, sqlx::Error> {
+async fn connect() -> Pool<Sqlite> {
     dotenv().ok();
     let base_path = env::current_dir().expect("Failed to determine the current directory");
     let database_url = base_path.join("api.db");
     let options = SqliteConnectOptions::new()
-        .filename(database_url)
-        .create_if_missing(true);
+       .filename(database_url)
+       .create_if_missing(true);
 
-    SqlitePool::connect_with(options).await
+    SqlitePool::connect_with(options).await.expect("Failed to connect to DB")
 }
+

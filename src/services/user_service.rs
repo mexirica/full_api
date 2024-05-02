@@ -5,9 +5,10 @@ use crate::auth;
 use crate::auth::compute_password_hash;
 use crate::models::users::{ChangePassword, Credentials, Users};
 use crate::repository::Repository;
+use crate::repository::uow::UnitOfWork;
 
 pub(crate) async fn handle_change_password(
-    pool: &SqlitePool,
+    uow: &UnitOfWork<'_>,
     json: &ChangePassword,
     req: &HttpRequest,
 ) -> Result<HttpResponse, HttpResponse> {
@@ -19,7 +20,7 @@ pub(crate) async fn handle_change_password(
    }
     let claims = claims.unwrap();
 
-    match Users::find_by_username(pool, &claims.sub).await {
+    match uow.user.find_by_username(&claims.sub).await {
         Ok(None) => Err(HttpResponse::BadRequest().finish()),
         Ok(Some(_)) => {
             let password_hashed = match compute_password_hash(&password) {
@@ -27,7 +28,7 @@ pub(crate) async fn handle_change_password(
                 Err(_) => return Err(HttpResponse::InternalServerError().finish()),
             };
 
-            match Users::change_password(pool, &claims.sub, &password_hashed).await {
+            match uow.user.change_password( &claims.sub, &password_hashed).await {
                 Ok(_) => Ok(HttpResponse::NoContent().finish()),
                 Err(_) => Err(HttpResponse::InternalServerError().finish()),
             }
@@ -38,13 +39,13 @@ pub(crate) async fn handle_change_password(
 
 
 pub async fn handle_create_user(
-    pool: &SqlitePool,
+    uow: &UnitOfWork<'_>,
     user: &Credentials,
 ) -> Result<HttpResponse, HttpResponse> {
     let username = &user.username;
     let password = &user.password;
 
-    if let Ok(existing_user) = Users::find_by_username(pool, username).await {
+    if let Ok(existing_user) = uow.user.find_by_username(username).await {
         if existing_user.is_some() {
             return Err(HttpResponse::BadRequest().finish());
         }
@@ -63,7 +64,7 @@ pub async fn handle_create_user(
         refresh_token: String::new(),
     };
 
-    match Users::save(pool, user).await {
+    match uow.user.save(user).await {
         Ok(_) => Ok(HttpResponse::Created().finish()),
         Err(_) => Err(HttpResponse::InternalServerError().finish()),
     }

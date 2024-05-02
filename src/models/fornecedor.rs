@@ -1,11 +1,12 @@
 use serde::{Deserialize, Serialize};
+use sqlx::{Pool, Sqlite};
 
 pub enum TipoFornecedor {
     PessoaFisica = 1,
     PessoaJuridica = 2,
 }
-#[derive(Debug, Serialize, Deserialize,Default)]
 
+#[derive(Debug, Serialize, Deserialize,Default)]
 pub struct Fornecedor {
     pub id: i64,
     pub nome: String,
@@ -32,4 +33,21 @@ pub struct NewFornecedor {
     pub nome: String,
     pub documento: String,
     pub tipo_fornecedor: i64,
+}
+#[derive(Clone)]
+pub struct FornecedorRepository<'a> {
+    pub pool:  Option<&'a Pool<Sqlite>>
+}
+
+impl Default for FornecedorRepository<'_> {
+    fn default() -> Self {
+        Self { pool: None }
+    }
+}
+
+impl<'a> FornecedorRepository<'a> {
+        pub fn new(pool: &'a Pool<Sqlite>) -> Self {
+            Self { pool: Some(pool) }
+        }
+
 }

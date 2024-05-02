@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, FromRow, SqlitePool};
+use sqlx::{Error, FromRow, Pool, Sqlite, SqlitePool};
+use crate::models::produto::ProdutoRepository;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 
@@ -24,8 +25,24 @@ pub struct UsernameQuery {
     pub username: String,
 }
 impl Users {
+}
+#[derive(Clone)]
+pub struct UserRepository<'a> {
+    pub pool: Option<&'a Pool<Sqlite>>
+}
+    impl Default for UserRepository<'_> {
+        fn default() -> Self {
+            Self { pool: None }
+        }
+    }
+
+impl UserRepository<'_> {
+    pub fn new(pool: & Pool<Sqlite>) -> Self {
+        Self { pool: Some(pool) }
+    }
+
     pub async fn find_by_username(
-        pool: &SqlitePool,
+        &self,
         username: &String,
     ) -> Result<Option<Users>, Error> {
         let row = sqlx::query_as!(
@@ -33,22 +50,22 @@ impl Users {
             r#"SELECT * FROM users WHERE username = $1"#,
             username
         )
-        .fetch_optional(pool)
+        .fetch_optional(self.pool.unwrap())
         .await?;
 
         Ok(row)
     }
 
-    pub async fn delete_by_username(pool: &SqlitePool, username: String) -> Result<(), Error> {
+    pub async fn delete_by_username(&self, username: String) -> Result<(), Error> {
         sqlx::query!(r#"DELETE FROM users WHERE username = $1"#, username)
-            .execute(pool)
+            .execute(self.pool.unwrap())
             .await?;
 
         Ok(())
     }
 
     pub async fn change_password(
-        pool: &SqlitePool,
+        &self,
         username: &String,
         password: &String,
     ) -> Result<(), Error> {
@@ -57,9 +74,9 @@ impl Users {
             password,
             username
         )
-        .execute(pool)
+        .execute(self.pool.unwrap())
         .await?;
 
         Ok(())
-    }
+}
 }

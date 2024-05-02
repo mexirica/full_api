@@ -1,13 +1,17 @@
-use sqlx::{Error, SqlitePool};
+use sqlx::Error;
 
 mod fornecedor;
 mod produto;
 mod user;
+pub (crate) mod uow;
 
 #[async_trait::async_trait]
 pub trait Repository<T> {
-    async fn find_by_id(pool: &SqlitePool, id: i64) -> Result<Option<T>, Error>;
-    async fn find_all(pool: &SqlitePool) -> Result<Vec<T>, Error>;
-    async fn save(pool: &SqlitePool, item: T) -> Result<(), Error>;
-    async fn delete(pool: &SqlitePool, id: i64) -> Result<(), Error>;
+    async fn find_by_id(&self, id: i64) -> Result<Option<T>, Error>;
+    async fn find_all(&self) -> Result<Vec<T>, Error>;
+    async fn save(&self, item: T) -> Result<(), Error>;
+    async fn update (&self, item: T) -> Result<(), Error>;
+    async fn delete(&self, id: i64) -> Result<(), Error>;
 }
+
+
