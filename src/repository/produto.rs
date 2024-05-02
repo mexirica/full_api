@@ -4,10 +4,10 @@ use crate::models::produto::{Produto, ProdutoRepository};
 use crate::repository::Repository;
 
 #[async_trait::async_trait]
-impl Repository<Produto> for ProdutoRepository<'_> {
+impl Repository<Produto> for ProdutoRepository {
     async fn find_by_id(&self, id: i64) -> Result<Option<Produto>, Error> {
         let result = sqlx::query_as!(Produto, r#"SELECT * FROM produto WHERE id = $1"#, id)
-            .fetch_optional(self.pool.unwrap())
+            .fetch_optional(&self.pool)
             .await?;
 
         Ok(result)
@@ -15,7 +15,7 @@ impl Repository<Produto> for ProdutoRepository<'_> {
 
     async fn find_all(&self) -> Result<Vec<Produto>, Error> {
         let rows = sqlx::query_as!(Produto, "SELECT * FROM produto")
-            .fetch_all(self.pool.unwrap())
+            .fetch_all(&self.pool)
             .await?;
 
         Ok(rows)
@@ -33,7 +33,7 @@ impl Repository<Produto> for ProdutoRepository<'_> {
             produto.fornecedores_id,
             produto.ativo
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -51,7 +51,7 @@ impl Repository<Produto> for ProdutoRepository<'_> {
             produto.ativo,
             produto.id
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -59,7 +59,7 @@ impl Repository<Produto> for ProdutoRepository<'_> {
 
     async fn delete(&self, id: i64) -> Result<(), Error> {
         sqlx::query!(r#"DELETE FROM produto WHERE id = $1"#, id)
-            .execute(self.pool.unwrap())
+            .execute(&self.pool)
             .await?;
 
         Ok(())

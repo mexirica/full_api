@@ -21,7 +21,7 @@ pub mod configure {
 }
 
 #[get("/{fornecedor_id}")]
-pub async fn get_fornecedor<'a>(uow: web::Data<UnitOfWork<'_>>, id: web::Path<i64>) -> impl Responder {
+pub async fn get_fornecedor(uow: web::Data<UnitOfWork>, id: web::Path<i64>) -> impl Responder {
     let id = id.into_inner();
 
     return uow.fornecedor.find_by_id(id)
@@ -31,7 +31,7 @@ pub async fn get_fornecedor<'a>(uow: web::Data<UnitOfWork<'_>>, id: web::Path<i6
 }
 
 #[post("")]
-pub async fn create_fornecedor(uow: web::Data<UnitOfWork< '_>>,fornecedor: web::Json<NewFornecedor>,req: HttpRequest) -> impl Responder {
+pub async fn create_fornecedor(uow: web::Data<UnitOfWork>,fornecedor: web::Json<NewFornecedor>,req: HttpRequest) -> impl Responder {
     let fornecedor = fornecedor.into_inner();
     match jwt::get_claims(&req) {
         Ok(claim) => {
