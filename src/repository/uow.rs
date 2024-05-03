@@ -1,28 +1,23 @@
-use sqlx::{Pool, Sqlite};
-
-use crate::models::{fornecedor::FornecedorRepository, produto::ProdutoRepository, users::UserRepository};
+use std::rc::Rc;
+use std::sync::Arc;
+use sqlx::{Pool, Sqlite, SqlitePool};
+use crate::models::fornecedor::FornecedorRepository;
+use crate::models::produto::ProdutoRepository;
+use crate::models::users::UserRepository;
 #[derive(Clone)]
-pub struct UnitOfWork<'a> {
-    pub pool: Pool<Sqlite>,
-    pub fornecedor: FornecedorRepository<'a>,
-    pub produto: ProdutoRepository<'a>,
-    pub user: UserRepository<'a>,
+pub struct UnitOfWork {
+    pub fornecedor: FornecedorRepository,
+    pub user: UserRepository,
+    pub produto: ProdutoRepository,
 }
 
-impl<'a> UnitOfWork<'a> {
-    pub async fn initialize(&'a mut self) {
-        self.fornecedor = FornecedorRepository::new(&self.pool);
-        self.produto = ProdutoRepository::new(&self.pool);
-        self.user = UserRepository::new(&self.pool);
-    }
-
-    pub async fn new(pool: Pool<Sqlite>) -> Self {
+impl UnitOfWork {
+    pub fn new(pool: SqlitePool) -> Self {
         Self {
-            pool,
-            fornecedor: FornecedorRepository::default(),
-            produto: ProdutoRepository::default(),
-            user: UserRepository::default(),
+            fornecedor: FornecedorRepository::new(pool.clone()),
+            user: UserRepository::new(pool.clone()),
+            produto: ProdutoRepository::new(pool.clone()),
         }
+
     }
 }
-

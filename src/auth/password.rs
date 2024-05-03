@@ -87,7 +87,7 @@ pub async fn change_password(
     )
     .execute(pool)
     .await
-    .context("Erro ao alterar a senha.")?;
+        .context("Failed to update password")?;
     Ok(())
 }
 

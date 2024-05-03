@@ -8,7 +8,7 @@ use crate::repository::Repository;
 use crate::repository::uow::UnitOfWork;
 
 pub(crate) async fn handle_change_password(
-    uow: &UnitOfWork<'_>,
+    uow: &UnitOfWork,
     json: &ChangePassword,
     req: &HttpRequest,
 ) -> Result<HttpResponse, HttpResponse> {
@@ -39,7 +39,7 @@ pub(crate) async fn handle_change_password(
 
 
 pub async fn handle_create_user(
-    uow: &UnitOfWork<'_>,
+    uow: &UnitOfWork,
     user: &Credentials,
 ) -> Result<HttpResponse, HttpResponse> {
     let username = &user.username;

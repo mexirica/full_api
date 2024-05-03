@@ -27,18 +27,13 @@ pub struct UsernameQuery {
 impl Users {
 }
 #[derive(Clone)]
-pub struct UserRepository<'a> {
-    pub pool: Option<&'a Pool<Sqlite>>
+pub struct UserRepository {
+    pub pool: SqlitePool
 }
-    impl Default for UserRepository<'_> {
-        fn default() -> Self {
-            Self { pool: None }
-        }
-    }
 
-impl UserRepository<'_> {
-    pub fn new(pool: & Pool<Sqlite>) -> Self {
-        Self { pool: Some(pool) }
+impl UserRepository {
+    pub fn new(pool: SqlitePool) -> Self {
+        Self { pool: (pool) }
     }
 
     pub async fn find_by_username(
@@ -50,7 +45,7 @@ impl UserRepository<'_> {
             r#"SELECT * FROM users WHERE username = $1"#,
             username
         )
-        .fetch_optional(self.pool.unwrap())
+        .fetch_optional(&self.pool)
         .await?;
 
         Ok(row)
@@ -58,7 +53,7 @@ impl UserRepository<'_> {
 
     pub async fn delete_by_username(&self, username: String) -> Result<(), Error> {
         sqlx::query!(r#"DELETE FROM users WHERE username = $1"#, username)
-            .execute(self.pool.unwrap())
+            .execute(&self.pool)
             .await?;
 
         Ok(())
@@ -74,7 +69,7 @@ impl UserRepository<'_> {
             password,
             username
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())

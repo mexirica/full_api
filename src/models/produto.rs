@@ -1,6 +1,6 @@
 use chrono::{NaiveDateTime, Utc};
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, Pool, Sqlite};
+use sqlx::{FromRow, Pool, Sqlite, SqlitePool};
 
 use crate::models::DTO;
 
@@ -49,16 +49,12 @@ impl From<NewProduto> for Produto {
 
 impl DTO for NewProduto {}
 #[derive(Clone)]
-pub struct ProdutoRepository<'a> {
-    pub pool:  Option<&'a Pool<Sqlite>>
+pub struct ProdutoRepository {
+    pub pool:  SqlitePool
 }
-impl Default for ProdutoRepository<'_> {
-    fn default() -> Self {
-        Self { pool: None }
-    }
-}
-impl<'a> ProdutoRepository<'a> {
-    pub fn new(pool: &'a Pool<Sqlite>) -> Self {
-        Self { pool: Some(pool) }
+
+impl<'a> ProdutoRepository {
+    pub fn new(pool: SqlitePool) -> Self {
+        Self { pool: (pool) }
     }
 }

@@ -1,5 +1,6 @@
+use std::sync::Arc;
 use serde::{Deserialize, Serialize};
-use sqlx::{Pool, Sqlite};
+use sqlx::{Pool, Sqlite, SqlitePool};
 
 pub enum TipoFornecedor {
     PessoaFisica = 1,
@@ -35,19 +36,13 @@ pub struct NewFornecedor {
     pub tipo_fornecedor: i64,
 }
 #[derive(Clone)]
-pub struct FornecedorRepository<'a> {
-    pub pool:  Option<&'a Pool<Sqlite>>
+pub struct FornecedorRepository {
+    pub pool: SqlitePool
 }
 
-impl Default for FornecedorRepository<'_> {
-    fn default() -> Self {
-        Self { pool: None }
-    }
-}
-
-impl<'a> FornecedorRepository<'a> {
-        pub fn new(pool: &'a Pool<Sqlite>) -> Self {
-            Self { pool: Some(pool) }
+impl<'a> FornecedorRepository {
+        pub fn new(pool: SqlitePool) -> Self {
+            Self { pool: (pool) }
         }
 
 }

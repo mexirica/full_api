@@ -4,10 +4,10 @@ use crate::models::fornecedor::{Fornecedor, FornecedorRepository};
 use crate::repository::Repository;
 
 #[async_trait::async_trait]
-impl Repository<Fornecedor> for FornecedorRepository<'_> {
+impl Repository<Fornecedor> for FornecedorRepository {
     async fn find_by_id(&self, id: i64) -> Result<Option<Fornecedor>, sqlx::Error> {
         let row = sqlx::query_as!(Fornecedor, r#"SELECT * FROM fornecedor WHERE id = $1"#, id)
-            .fetch_optional(self.pool.unwrap())
+            .fetch_optional(&self.pool)
             .await?;
 
         Ok(row)
@@ -15,7 +15,7 @@ impl Repository<Fornecedor> for FornecedorRepository<'_> {
 
     async fn find_all(&self) -> Result<Vec<Fornecedor>, sqlx::Error> {
         let rows = sqlx::query_as!(Fornecedor, "SELECT * FROM fornecedor")
-            .fetch_all(self.pool.unwrap())
+            .fetch_all(&self.pool)
             .await?;
 
         Ok(rows)
@@ -32,7 +32,7 @@ impl Repository<Fornecedor> for FornecedorRepository<'_> {
             fornecedor.tipo_fornecedor,
             fornecedor.ativo
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -48,7 +48,7 @@ impl Repository<Fornecedor> for FornecedorRepository<'_> {
             fornecedor.ativo,
             fornecedor.id
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -56,7 +56,7 @@ impl Repository<Fornecedor> for FornecedorRepository<'_> {
 
     async fn delete(&self, id: i64) -> Result<(), sqlx::Error> {
         let rows_affected = sqlx::query!(r#"DELETE FROM fornecedor WHERE id = $1"#, id)
-            .execute(self.pool.unwrap())
+            .execute(&self.pool)
             .await?;
 
         Ok(())

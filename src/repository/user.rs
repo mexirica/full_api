@@ -4,10 +4,10 @@ use crate::models::users::{UserRepository, Users};
 use crate::repository::Repository;
 
 #[async_trait::async_trait]
-impl Repository<Users> for UserRepository<'_> {
+impl Repository<Users> for UserRepository {
     async fn find_by_id(&self, id: i64) -> Result<Option<Users>, Error> {
         let row = sqlx::query_as!(Users, r#"SELECT * FROM Users WHERE username = $1"#, id)
-            .fetch_optional(self.pool.unwrap())
+            .fetch_optional(&self.pool)
             .await?;
 
         Ok(row)
@@ -15,7 +15,7 @@ impl Repository<Users> for UserRepository<'_> {
 
     async fn find_all(&self) -> Result<Vec<Users>, Error> {
         let rows = sqlx::query_as!(Users, "SELECT * FROM Users")
-            .fetch_all(self.pool.unwrap())
+            .fetch_all(&self.pool)
             .await?;
 
         Ok(rows)
@@ -29,7 +29,7 @@ impl Repository<Users> for UserRepository<'_> {
             user.password,
             user.refresh_token
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -43,7 +43,7 @@ impl Repository<Users> for UserRepository<'_> {
             user.refresh_token,
             user.username
         )
-        .execute(self.pool.unwrap())
+        .execute(&self.pool)
         .await?;
 
         Ok(())
@@ -51,7 +51,7 @@ impl Repository<Users> for UserRepository<'_> {
 
     async fn delete(&self, id: i64) -> Result<(), Error> {
         let _rows_affected = sqlx::query!(r#"DELETE FROM Users WHERE username = $1"#, id)
-            .execute(self.pool.unwrap())
+            .execute(&self.pool)
             .await?;
 
         Ok(())
