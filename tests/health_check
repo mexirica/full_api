@@ -1,0 +1,8 @@
+#[tokio::test]
+#[cfg(test)]
+async fn test_get() {
+    let client = Client::new();
+    let response = client.get("https://127.0.0.1:8080/health").send().await.unwrap();
+    assert_eq!(response.status(), 200);
+    assert_eq!(response.text().await.unwrap(), "Is working!");
+}
