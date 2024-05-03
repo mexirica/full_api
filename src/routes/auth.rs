@@ -7,8 +7,8 @@ use crate::models::users::Credentials;
 
 pub mod configure {
     use actix_web::web;
-    use crate::routes::auth::login;
 
+    use crate::routes::auth::login;
 
     pub fn handler(cfg: &mut web::ServiceConfig) {
         cfg.service(

@@ -1,4 +1,4 @@
-use sqlx::{Error, SqlitePool};
+use sqlx::Error;
 
 use crate::models::users::{UserRepository, Users};
 use crate::repository::Repository;

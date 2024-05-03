@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="api" uuid="e24a9597-72c8-46f2-87f0-d479aabee8e9">
+    <data-source source="LOCAL" name="api.db" uuid="7dbf8cbc-0fc6-473a-a5e4-e379fc04414b">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/api.db</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$USER_HOME$/full_api/api.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

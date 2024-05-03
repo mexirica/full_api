@@ -1,5 +1,4 @@
 use actix_web::{HttpRequest, HttpResponse};
-use sqlx::SqlitePool;
 
 use crate::auth;
 use crate::auth::compute_password_hash;

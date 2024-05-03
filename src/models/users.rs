@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{Error, FromRow, Pool, Sqlite, SqlitePool};
-use crate::models::produto::ProdutoRepository;
+use sqlx::{Error, FromRow, SqlitePool};
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 

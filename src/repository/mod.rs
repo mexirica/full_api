@@ -1,7 +1,7 @@
 use sqlx::Error;
 
-mod fornecedor;
-mod produto;
+mod supplier;
+mod product;
 mod user;
 pub (crate) mod uow;
 

@@ -1,22 +1,22 @@
-use std::rc::Rc;
-use std::sync::Arc;
-use sqlx::{Pool, Sqlite, SqlitePool};
-use crate::models::fornecedor::FornecedorRepository;
-use crate::models::produto::ProdutoRepository;
+use sqlx::SqlitePool;
+
+use crate::models::product::ProductRepository;
+use crate::models::supplier::SupplierRepository;
 use crate::models::users::UserRepository;
+
 #[derive(Clone)]
 pub struct UnitOfWork {
-    pub fornecedor: FornecedorRepository,
+    pub supplier: SupplierRepository,
     pub user: UserRepository,
-    pub produto: ProdutoRepository,
+    pub product: ProductRepository,
 }
 
 impl UnitOfWork {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
-            fornecedor: FornecedorRepository::new(pool.clone()),
+            supplier: SupplierRepository::new(pool.clone()),
             user: UserRepository::new(pool.clone()),
-            produto: ProdutoRepository::new(pool.clone()),
+            product: ProductRepository::new(pool),
         }
 
     }

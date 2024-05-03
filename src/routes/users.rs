@@ -1,10 +1,10 @@
 use actix_web::{delete, get, HttpRequest, HttpResponse, post, put, Responder, web, web::Json};
-use sqlx::SqlitePool;
 
 use crate::models::users::*;
-use crate::repository::uow::UnitOfWork;
 use crate::repository::Repository;
+use crate::repository::uow::UnitOfWork;
 use crate::services::user_service::{handle_change_password, handle_create_user};
+use utoipa::openapi::{self, OpenApi}; // Add this import statement
 
 pub mod configure {
     use actix_web::web;
@@ -23,7 +23,7 @@ pub mod configure {
 }
 
 #[post("")]
-pub async fn create_user<'a>(uow: web::Data<UnitOfWork>, user: Json<Credentials>) -> impl Responder {
+pub async fn create_user(uow: web::Data<UnitOfWork>, user: Json<Credentials>) -> impl Responder {
     handle_create_user(&uow, &user.into_inner()).await
         .unwrap_or_else(|error| error)
 }
@@ -51,6 +51,12 @@ pub async fn change_password(
         .unwrap_or_else(|error| error)
 }
 
+#[utoipa::path(
+    responses(
+        (status = 200, description = "User found"),
+        (status = 404, description = "User not found"),
+    )
+)]
 #[get("/{username}")]
 pub async fn get_user(uow: web::Data<UnitOfWork>, username: web::Path<String>) -> impl Responder {
     let username = username.into_inner();
