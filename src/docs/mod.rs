@@ -5,7 +5,8 @@ use crate::routes::users;
 #[derive(OpenApi)]
 #[openapi(
 info(title = "User API", version = "1.0.0"),
-paths(
-/{username})
+paths (
+get_user
+),
 )]
 pub struct OpenApiDoc;

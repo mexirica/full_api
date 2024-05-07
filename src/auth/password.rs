@@ -4,7 +4,6 @@ use argon2::password_hash::SaltString;
 use sqlx::SqlitePool;
 
 use crate::models::users::Credentials;
-use crate::telemetry::spawn_blocking_with_tracing;
 
 #[derive(thiserror::Error, Debug)]
 pub enum AuthError {
@@ -73,8 +72,7 @@ pub async fn change_password(
     password: String,
     pool: &SqlitePool,
 ) -> Result<(), anyhow::Error> {
-    let password_hash = spawn_blocking_with_tracing(move || compute_password_hash(&password))
-        .await?
+    let password_hash = compute_password_hash(&password)
         .context("Failed to hash password")?;
     sqlx::query!(
         r#"

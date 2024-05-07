@@ -42,7 +42,7 @@ pub async fn delete_by_username(
 #[put("")]
 pub async fn change_password(
     uow: web::Data<UnitOfWork>,
-    json: web::Json<ChangePassword>,
+    json: Json<ChangePassword>,
     req: HttpRequest,
 ) -> impl Responder {
     handle_change_password(&uow, &json.into_inner(), &req)
@@ -51,15 +51,11 @@ pub async fn change_password(
         .unwrap_or_else(|error| error)
 }
 
-#[utoipa::path(
-    responses(
-        (status = 200, description = "User found"),
-        (status = 404, description = "User not found"),
-    )
-)]
+#[utoipa::path(get, path = "/users/{username}")]
 #[get("/{username}")]
 pub async fn get_user(uow: web::Data<UnitOfWork>, username: web::Path<String>) -> impl Responder {
     let username = username.into_inner();
+
 
     return uow.user.find_by_username(&username)
         .await
