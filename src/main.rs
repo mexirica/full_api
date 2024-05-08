@@ -1,38 +1,31 @@
-
-use std::env;
-
 use actix_web::{App, get, HttpServer, Responder, web};
+use actix_web::middleware::Logger;
 use actix_web::web::Data;
-use dotenv::dotenv;
-use sqlx::sqlite::SqliteConnectOptions;
-use sqlx::SqlitePool;
-use utoipa::{
-    openapi::security::{HttpAuthScheme,HttpBuilder, SecurityScheme},
-    Modify, OpenApi, ToSchema
-};
-
+use utoipa::{Modify, OpenApi, ToSchema};
 use utoipa_swagger_ui::SwaggerUi;
-
-use repository::uow;
-use uow::UnitOfWork;
+use crate::auth::handle_unauthorized;
 
 mod auth;
 mod models;
-mod repository;
 mod routes;
 mod services;
 mod docs;
+mod log;
+mod db;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
 
-    let pool = connect().await;
-    let uow = UnitOfWork::new(pool);
-
+    log4rs::init_config(log::configure_log()).unwrap();
     let openapi = docs::ApiDoc::openapi();
+
+    let pool = db::connect().await;
+    let uow = db::UnitOfWork::new(pool);
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
+            .wrap(Logger::new("%a %{User-Agent}i"))
             .app_data(Data::new(uow.clone()))
             .service(SwaggerUi::new("/swagger-ui/{_:.*}").url(
                 "/api-docs/openapi.json",
@@ -42,21 +35,12 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::users::configure::handler)
             .configure(routes::auth::configure::handler)
             .configure(routes::supplier::configure::handler)
+            .default_service(web::route().to(handle_unauthorized))
 
     })
     .bind("127.0.0.1:8080")?
     .run()
     .await
-}
-async fn connect() -> SqlitePool {
-    dotenv().ok();
-    let base_path = env::current_dir().expect("Failed to determine the current directory");
-    let database_url = base_path.join("api.db");
-    let options = SqliteConnectOptions::new()
-       .filename(database_url)
-       .create_if_missing(true);
-
-    SqlitePool::connect_with(options).await.expect("Failed to connect to DB")
 }
 #[utoipa::path(
 responses (

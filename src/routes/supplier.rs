@@ -1,19 +1,23 @@
 use actix_web::{get, HttpRequest, HttpResponse, post, Responder, web};
 
 use crate::auth::jwt;
+use crate::db::repository::Repository;
+use crate::db::UnitOfWork;
 use crate::models::supplier::{NewSupplier, Supplier};
-use crate::repository::Repository;
-use crate::repository::uow::UnitOfWork;
+
 
 pub mod configure {
+    use actix_web::guard::fn_guard;
     use actix_web::web;
 
     use crate::routes::supplier::*;
 
     pub fn handler(cfg: &mut web::ServiceConfig) {
         cfg.service(
-            web::scope("/supplieres")
+            web::scope("/suppliers")
+                .guard(fn_guard(jwt::verify_token))
             .service(get_supplier)
+                .service(create_supplier)
         );
     }
 }

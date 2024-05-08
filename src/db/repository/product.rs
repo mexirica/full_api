@@ -1,7 +1,7 @@
 use sqlx::{Error, SqlitePool};
 
 use crate::models::product::{Product, ProductRepository};
-use crate::repository::Repository;
+use crate::db::repository::Repository;
 
 #[async_trait::async_trait]
 impl Repository<Product> for ProductRepository {

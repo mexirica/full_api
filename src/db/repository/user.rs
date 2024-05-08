@@ -1,7 +1,7 @@
 use sqlx::Error;
 
 use crate::models::users::{UserRepository, Users};
-use crate::repository::Repository;
+use crate::db::repository::Repository;
 
 #[async_trait::async_trait]
 impl Repository<Users> for UserRepository {

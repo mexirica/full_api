@@ -1,7 +1,6 @@
-use sqlx::SqlitePool;
+use crate::db::repository::Repository;
 
 use crate::models::supplier::{Supplier, SupplierRepository};
-use crate::repository::Repository;
 
 #[async_trait::async_trait]
 impl Repository<Supplier> for SupplierRepository {

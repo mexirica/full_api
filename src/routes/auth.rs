@@ -2,8 +2,9 @@ use actix_web::{HttpResponse, post, Responder, web};
 
 use crate::auth::{create_access_token, create_refresh_token, JwtResponse};
 use crate::auth::password::validate_credentials;
+use crate::db::UnitOfWork;
 use crate::models::users::Credentials;
-use crate::repository::uow::UnitOfWork;
+
 
 pub mod configure {
     use actix_web::web;

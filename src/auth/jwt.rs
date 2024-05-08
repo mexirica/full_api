@@ -1,8 +1,10 @@
-use actix_web::HttpRequest;
+use actix_web::guard::GuardContext;
+use actix_web::{HttpRequest, HttpResponse};
 use chrono::{Duration, Local};
 use jsonwebtoken::{decode, DecodingKey, encode, EncodingKey, Header, Validation};
 use jsonwebtoken::Algorithm::HS256;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -11,6 +13,8 @@ pub struct Claims {
     pub iat: i64,
     pub exp: i64,
 }
+
+const SECRETKEY: &str = "superSecretKey";
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JwtResponse {
@@ -32,7 +36,7 @@ pub async fn create_access_token(user: &String) -> Result<String, jsonwebtoken::
     let token = encode(
         &Header::new(HS256),
         &claims,
-        &EncodingKey::from_secret("superSecretKey".as_ref()),
+        &EncodingKey::from_secret(SECRETKEY.as_ref()),
     );
 
     match token {
@@ -55,7 +59,7 @@ pub async fn create_refresh_token(user: &String) -> Result<String, jsonwebtoken:
     let token = encode(
         &Header::new(HS256),
         &claims,
-        &EncodingKey::from_secret("superSecretKey".as_ref()),
+        &EncodingKey::from_secret(SECRETKEY.as_ref()),
     );
 
     match token {
@@ -65,11 +69,13 @@ pub async fn create_refresh_token(user: &String) -> Result<String, jsonwebtoken:
 }
 
 fn validate_token(token: &str) -> Result<(), String> {
-    let decoding_key = DecodingKey::from_secret("superSecretKey".as_ref());
+    let decoding_key = DecodingKey::from_secret(SECRETKEY.as_ref());
 
     let validation = Validation::new(HS256);
+    let binding = token.replace("Bearer ", "");
+    let token_value = binding.as_str();
 
-    match decode::<serde_json::Value>(token, &decoding_key, &validation) {
+    match decode::<serde_json::Value>(token_value, &decoding_key, &validation) {
         Ok(_) => Ok(()),
         Err(e) => Err(format!("Token validation failed: {}", e)),
     }
@@ -81,7 +87,7 @@ pub fn get_claims(req: &HttpRequest) -> Result<Claims, jsonwebtoken::errors::Err
             if auth_str.starts_with("Bearer ") {
                 let token = &auth_str[7..];
 
-                let decoding_key = DecodingKey::from_secret("superSecretKey".as_ref());
+                let decoding_key = DecodingKey::from_secret(SECRETKEY.as_ref());
                 let validation = Validation::new(HS256);
 
                 return match decode::<Claims>(token, &decoding_key, &validation) {
@@ -96,4 +102,18 @@ pub fn get_claims(req: &HttpRequest) -> Result<Claims, jsonwebtoken::errors::Err
         }
     }
     Err(jsonwebtoken::errors::ErrorKind::InvalidToken)
+}
+
+pub fn verify_token(ctx: &GuardContext) -> bool {
+    let auth_header = ctx.head().headers().get("authorization");
+    if auth_header.is_none() {
+        HttpResponse::Unauthorized().json(json!({"error" : "Invalid token"}));
+        return false;
+    }
+    let token = auth_header.unwrap().to_str().unwrap();
+    validate_token(token).is_ok()
+}
+
+pub async fn handle_unauthorized() -> HttpResponse {
+    HttpResponse::Unauthorized().json(json!({"error": "Unauthorized"}))
 }

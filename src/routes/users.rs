@@ -1,19 +1,20 @@
 use actix_web::{delete, get, HttpRequest, HttpResponse, post, put, Responder, web, web::Json};
+use crate::db::UnitOfWork;
 
 use crate::models::users::*;
-use crate::repository::Repository;
-use crate::repository::uow::UnitOfWork;
 use crate::services::user_service::{handle_change_password, handle_create_user};
-use utoipa::openapi::{self, OpenApi}; // Add this import statement
 
 pub mod configure {
+    use actix_web::guard::fn_guard;
     use actix_web::web;
+    use crate::auth::jwt;
 
     use crate::routes::users::*;
 
     pub fn handler(cfg: &mut web::ServiceConfig) {
         cfg.service(
             web::scope("/users")
+                .guard(fn_guard(jwt::verify_token))
                 .service(create_user)
                 .service(delete_by_username)
                 .service(change_password)
@@ -51,7 +52,6 @@ pub async fn change_password(
         .unwrap_or_else(|error| error)
 }
 
-#[utoipa::path(get, path = "/users/{username}")]
 #[get("/{username}")]
 pub async fn get_user(uow: web::Data<UnitOfWork>, username: web::Path<String>) -> impl Responder {
     let username = username.into_inner();
