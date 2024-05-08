@@ -18,14 +18,9 @@ anyhow = "1.0.82"
 argon2 = { version = "0.6.0-pre.0", features = ["std"] }
 thiserror = "1.0.58"
 tracing = "0.1.40"
-uuid = { version = "1.8.0", features = ["v4"] }
 rand = "0.8.5"
 jsonwebtoken = "9.3.0"
-actix-swagger = "0.3.1"
-utoipa-swagger-ui = { version = "6", features = ["actix-web"] }
+utoipa-swagger-ui = { version = "7.0.1", features = ["actix-web"] }
 utoipa = { version = "4.2", features = ["actix_extras"] }
 log4rs = "1.0"
 log = "0.4.21"
-console = "0.15.8"
-futures = "0.3.30"
-pin-project = "1.1.5"
