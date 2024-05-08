@@ -2,9 +2,9 @@ use actix_web::{HttpRequest, HttpResponse};
 
 use crate::auth;
 use crate::auth::compute_password_hash;
+use crate::db::repository::Repository;
 use crate::models::users::{ChangePassword, Credentials, Users};
-use crate::repository::Repository;
-use crate::repository::uow::UnitOfWork;
+use crate::db::UnitOfWork;
 
 pub(crate) async fn handle_change_password(
     uow: &UnitOfWork,

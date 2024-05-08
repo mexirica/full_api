@@ -24,3 +24,6 @@ jsonwebtoken = "9.3.0"
 actix-swagger = "0.3.1"
 utoipa-swagger-ui = { version = "6", features = ["actix-web"] }
 utoipa = { version = "4.2", features = ["actix_extras"] }
+log4rs = "1.0"
+log = "0.4.21"
+console = "0.15.8"

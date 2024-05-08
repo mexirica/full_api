@@ -1,10 +1,8 @@
 use actix_web::{delete, get, HttpRequest, HttpResponse, post, put, Responder, web, web::Json};
+use crate::db::UnitOfWork;
 
 use crate::models::users::*;
-use crate::repository::Repository;
-use crate::repository::uow::UnitOfWork;
 use crate::services::user_service::{handle_change_password, handle_create_user};
-use utoipa::openapi::{self, OpenApi}; // Add this import statement
 
 pub mod configure {
     use actix_web::web;
