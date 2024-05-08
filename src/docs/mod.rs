@@ -1,12 +1,32 @@
-use crate::docs::users::__path_get_user;
-use utoipa::OpenApi;
-use crate::routes::users;
+use crate::__path_health;
+use super::{routes,health};
+use utoipa::{Modify, OpenApi};
+use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
 
 #[derive(OpenApi)]
 #[openapi(
-info(title = "User API", version = "1.0.0"),
-paths (
-get_user
+paths(
+health,
+routes::auth::login
 ),
 )]
-pub struct OpenApiDoc;
+pub(crate) struct ApiDoc;
+
+struct SecurityAddon;
+
+impl Modify for SecurityAddon {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let components = openapi.components.as_mut().unwrap();
+        components.add_security_scheme(
+            "bearerAuth", SecurityScheme::Http(HttpBuilder::new()
+                .scheme(HttpAuthScheme::Bearer)
+                .bearer_format("JWT")
+                .build()),
+        );
+        components.add_security_scheme(
+            "basicAuth", SecurityScheme::Http(HttpBuilder::new()
+                .scheme(HttpAuthScheme::Basic)
+                .build()),
+        );
+    }
+}

@@ -29,35 +29,7 @@ async fn main() -> std::io::Result<()> {
     let pool = connect().await;
     let uow = UnitOfWork::new(pool);
 
-    #[derive(OpenApi)]
-    #[openapi(
-        paths(
-        health,
-        routes::auth::login
-        ),
-    )]
-    struct ApiDoc;
-
-    struct SecurityAddon;
-
-    impl Modify for SecurityAddon {
-        fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
-            let components = openapi.components.as_mut().unwrap();
-            components.add_security_scheme(
-                "bearerAuth", SecurityScheme::Http(HttpBuilder::new()
-                    .scheme(HttpAuthScheme::Bearer)
-                    .bearer_format("JWT")
-                    .build()),
-            );
-            components.add_security_scheme(
-                "basicAuth", SecurityScheme::Http(HttpBuilder::new()
-                    .scheme(HttpAuthScheme::Basic)
-                    .build()),
-            );
-        }
-    }
-
-    let openapi = ApiDoc::openapi();
+    let openapi = docs::ApiDoc::openapi();
 
     HttpServer::new(move || {
         App::new()
